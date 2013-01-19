@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MediaScout
-{
-    public class TVScoutOptions
-    {
+namespace XbmcScout.Core {
+    public class TVScoutOptions {
         public bool SaveXBMCMeta;
         public bool SaveMyMoviesMeta;
 
@@ -18,7 +16,7 @@ namespace MediaScout
         public String SpecialsFolderName;
         public bool DownloadAllPosters;
         public bool DownloadAllBackdrops;
-        public bool DownloadAllBanners;        
+        public bool DownloadAllBanners;
         public bool DownloadAllSeasonPosters;
         public bool DownloadAllSeasonBackdrops;
 

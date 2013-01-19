@@ -6,11 +6,9 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.IO;
 
-namespace MediaScout
-{
+namespace XbmcScout.Core {
     [XmlRoot("tvshow")]
-    public class TVShowNFO
-    {
+    public class TVShowNFO {
         public String title;
         public String rating;
         public String year;
@@ -26,8 +24,7 @@ namespace MediaScout
         public String id;
         public String set;
         public String aired;
-        public String premiered
-        {
+        public String premiered {
             get { return aired; }
             set { aired = value; }
         }
@@ -43,8 +40,7 @@ namespace MediaScout
 
         public String trailer;
 
-        public void Save(String FilePath)
-        {
+        public void Save(String FilePath) {
             XmlSerializer s = new XmlSerializer(typeof(TVShowNFO));
             TextWriter w = new StreamWriter(FilePath);
             s.Serialize(w, this);

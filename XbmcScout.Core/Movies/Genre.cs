@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace MediaScout
-{
-    public class Genre
-    {
+namespace XbmcScout.Core {
+    public class Genre {
         [XmlText]
         public String name;
 

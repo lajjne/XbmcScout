@@ -5,14 +5,11 @@ using System.Text;
 using System.Collections;
 using System.Reflection;
 
-namespace MediaScout
-{
-    public static class StringEnum
-    {
+namespace XbmcScout.Core {
+    public static class StringEnum {
         private static Hashtable _stringValues = new Hashtable();
 
-        public static string GetStringValue(Enum value)
-        {
+        public static string GetStringValue(Enum value) {
             string output = null;
             Type type = value.GetType();
 
@@ -20,8 +17,7 @@ namespace MediaScout
 
             if (_stringValues.ContainsKey(value))
                 output = (_stringValues[value] as StringValueAttribute).Value;
-            else
-            {
+            else {
                 //Look for our 'StringValueAttribute' 
 
                 //in the field's custom attributes
@@ -30,8 +26,7 @@ namespace MediaScout
                 StringValueAttribute[] attrs =
                    fi.GetCustomAttributes(typeof(StringValueAttribute),
                                            false) as StringValueAttribute[];
-                if (attrs.Length > 0)
-                {
+                if (attrs.Length > 0) {
                     _stringValues.Add(value, attrs[0]);
                     output = attrs[0].Value;
                 }

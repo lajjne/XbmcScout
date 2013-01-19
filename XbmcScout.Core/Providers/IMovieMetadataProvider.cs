@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MediaScout.Providers
-{
-    public interface IMovieMetadataProvider : IMetadataProvider
-    {
+namespace XbmcScout.Core.Providers {
+    public interface IMovieMetadataProvider : IMetadataProvider {
         MovieXML[] Search(String MovieName);
         MovieXML Get(String MovieID);
     }

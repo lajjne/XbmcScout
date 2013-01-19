@@ -6,18 +6,15 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-namespace SamSoft.VideoBrowser.Util.VideoProcessing
-{
-    public static class ThumbCreator
-    {
+namespace SamSoft.VideoBrowser.Util.VideoProcessing {
+    public static class ThumbCreator {
 
         #region interop (from the direct show lib project)
 
         [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
    Guid("0579154A-2B53-4994-B0D0-E773148EFF85"),
    InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        public interface ISampleGrabberCB
-        {
+        public interface ISampleGrabberCB {
             /// <summary>
             /// When called, callee must release pSample
             /// </summary>
@@ -31,8 +28,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
         [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     Guid("56a8689a-0ad4-11ce-b03a-0020af0ba770"),
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        public interface IMediaSample
-        {
+        public interface IMediaSample {
             [PreserveSig]
             int GetPointer([Out] out IntPtr ppBuffer); // BYTE **
 
@@ -100,8 +96,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
         [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     Guid("6B652FFF-11FE-4fce-92AD-0266B5D7C78F"),
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        public interface ISampleGrabber
-        {
+        public interface ISampleGrabber {
             [PreserveSig]
             int SetOneShot(
                 [In, MarshalAs(UnmanagedType.Bool)] bool OneShot);
@@ -131,8 +126,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
         [ComImport, System.Security.SuppressUnmanagedCodeSecurity,
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
     Guid("65BD0710-24D2-4ff7-9324-ED2E5D3ABAFA")]
-        public interface IMediaDet
-        {
+        public interface IMediaDet {
             [PreserveSig]
             int get_Filter(
                 [MarshalAs(UnmanagedType.IUnknown)] out object pVal
@@ -221,8 +215,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
         /// it should be released with FreeAMMediaType() to avoid leaking
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        public class AMMediaType
-        {
+        public class AMMediaType {
             public Guid majorType;
             public Guid subType;
             [MarshalAs(UnmanagedType.Bool)]
@@ -237,8 +230,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public class DsRect
-        {
+        public class DsRect {
             public int left;
             public int top;
             public int right;
@@ -247,8 +239,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
             /// <summary>
             /// Empty contructor. Initialize all fields to 0
             /// </summary>
-            public DsRect()
-            {
+            public DsRect() {
                 this.left = 0;
                 this.top = 0;
                 this.right = 0;
@@ -262,8 +253,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
             /// <param name="top">the top value</param>
             /// <param name="right">the right value</param>
             /// <param name="bottom">the bottom value</param>
-            public DsRect(int left, int top, int right, int bottom)
-            {
+            public DsRect(int left, int top, int right, int bottom) {
                 this.left = left;
                 this.top = top;
                 this.right = right;
@@ -277,8 +267,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
             /// <remarks>
             /// Warning, DsRect define a rectangle by defining two of his corners and <see cref="System.Drawing.Rectangle"/> define a rectangle with his upper/left corner, his width and his height.
             /// </remarks>
-            public DsRect(Rectangle rectangle)
-            {
+            public DsRect(Rectangle rectangle) {
                 this.left = rectangle.Left;
                 this.top = rectangle.Top;
                 this.right = rectangle.Right;
@@ -289,13 +278,11 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
             /// Provide de string representation of this DsRect instance
             /// </summary>
             /// <returns>A string formated like this : [left, top - right, bottom]</returns>
-            public override string ToString()
-            {
+            public override string ToString() {
                 return string.Format("[{0}, {1} - {2}, {3}]", this.left, this.top, this.right, this.bottom);
             }
 
-            public override int GetHashCode()
-            {
+            public override int GetHashCode() {
                 return this.left.GetHashCode() |
                     this.top.GetHashCode() |
                     this.right.GetHashCode() |
@@ -316,8 +303,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
             /// </summary>
             /// <param name="r">a DsRect to be cast</param>
             /// <returns>A casted System.Drawing.Rectangle</returns>
-            public static implicit operator Rectangle(DsRect r)
-            {
+            public static implicit operator Rectangle(DsRect r) {
                 return r.ToRectangle();
             }
 
@@ -335,8 +321,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
             /// </summary>
             /// <param name="r">A System.Drawing.Rectangle to be cast</param>
             /// <returns>A casted DsRect</returns>
-            public static implicit operator DsRect(Rectangle r)
-            {
+            public static implicit operator DsRect(Rectangle r) {
                 return new DsRect(r);
             }
 
@@ -344,8 +329,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
             /// Get the System.Drawing.Rectangle equivalent to this DirectShowLib.DsRect instance.
             /// </summary>
             /// <returns>A System.Drawing.Rectangle</returns>
-            public Rectangle ToRectangle()
-            {
+            public Rectangle ToRectangle() {
                 return new Rectangle(this.left, this.top, (this.right - this.left), (this.bottom - this.top));
             }
 
@@ -354,8 +338,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
             /// </summary>
             /// <param name="r">The <see cref="System.Drawing.Rectangle"/> used to initialize this new DirectShowLib.DsGuid</param>
             /// <returns>A new instance of DirectShowLib.DsGuid</returns>
-            public static DsRect FromRectangle(Rectangle r)
-            {
+            public static DsRect FromRectangle(Rectangle r) {
                 return new DsRect(r);
             }
         }
@@ -364,8 +347,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
         /// From BITMAPINFOHEADER
         /// </summary>
         [StructLayout(LayoutKind.Sequential, Pack = 2)]
-        public class BitmapInfoHeader
-        {
+        public class BitmapInfoHeader {
             public int Size;
             public int Width;
             public int Height;
@@ -383,8 +365,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
         /// From VIDEOINFOHEADER
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        public class VideoInfoHeader
-        {
+        public class VideoInfoHeader {
             public DsRect SrcRect;
             public DsRect TargetRect;
             public int BitRate;
@@ -400,8 +381,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
         /// This class is necessary to enable null paramters passing.
         /// </remarks>
         [StructLayout(LayoutKind.Sequential)]
-        public class DsLong
-        {
+        public class DsLong {
             private long Value;
 
             /// <summary>
@@ -409,8 +389,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
             /// Initialize a new instance of DirectShowLib.DsLong with the Value parameter
             /// </summary>
             /// <param name="Value">Value to assign to this new instance</param>
-            public DsLong(long Value)
-            {
+            public DsLong(long Value) {
                 this.Value = Value;
             }
 
@@ -418,13 +397,11 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
             /// Get a string representation of this DirectShowLib.DsLong Instance.
             /// </summary>
             /// <returns>A string representing this instance</returns>
-            public override string ToString()
-            {
+            public override string ToString() {
                 return this.Value.ToString();
             }
 
-            public override int GetHashCode()
-            {
+            public override int GetHashCode() {
                 return this.Value.GetHashCode();
             }
 
@@ -442,8 +419,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
             /// </summary>
             /// <param name="g">DirectShowLib.DsLong to be cast</param>
             /// <returns>A casted System.Int64</returns>
-            public static implicit operator long(DsLong l)
-            {
+            public static implicit operator long(DsLong l) {
                 return l.Value;
             }
 
@@ -461,8 +437,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
             /// </summary>
             /// <param name="g">System.Int64 to be cast</param>
             /// <returns>A casted DirectShowLib.DsLong</returns>
-            public static implicit operator DsLong(long l)
-            {
+            public static implicit operator DsLong(long l) {
                 return new DsLong(l);
             }
 
@@ -470,8 +445,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
             /// Get the System.Int64 equivalent to this DirectShowLib.DsLong instance.
             /// </summary>
             /// <returns>A System.Int64</returns>
-            public long ToInt64()
-            {
+            public long ToInt64() {
                 return this.Value;
             }
 
@@ -480,8 +454,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
             /// </summary>
             /// <param name="g">The System.Int64 to wrap into a DirectShowLib.DsLong</param>
             /// <returns>A new instance of DirectShowLib.DsLong</returns>
-            public static DsLong FromInt64(long l)
-            {
+            public static DsLong FromInt64(long l) {
                 return new DsLong(l);
             }
         }
@@ -490,8 +463,7 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
         /// From CLSID_MediaDet
         /// </summary>
         [ComImport, Guid("65BD0711-24D2-4ff7-9324-ED2E5D3ABAFA")]
-        public class MediaDet
-        {
+        public class MediaDet {
         }
 
         #endregion
@@ -499,9 +471,8 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
         static Guid videoType = new
                   System.Guid("73646976-0000-0010-8000-00AA00389B71");
 
-        public static bool CreateThumb(string videoFilename, string thumbFilename, double positionPercent)
-        {
-            
+        public static bool CreateThumb(string videoFilename, string thumbFilename, double positionPercent) {
+
             bool rval = false;
             IMediaDet m = new MediaDet() as IMediaDet;
             m.put_Filename(videoFilename);
@@ -511,14 +482,12 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
 
             AMMediaType media_type = new AMMediaType();
 
-            for (int i = 0; i < streamCount; i++)
-            {
+            for (int i = 0; i < streamCount; i++) {
                 m.get_StreamMediaType(media_type);
 
                 VideoInfoHeader vih = (VideoInfoHeader)Marshal.PtrToStructure(media_type.formatPtr, typeof(VideoInfoHeader));
 
-                if (vih == null)
-                {
+                if (vih == null) {
                     continue;
                 }
 
@@ -529,17 +498,14 @@ namespace SamSoft.VideoBrowser.Util.VideoProcessing
                 int width = vih.BmiHeader.Width;
                 int height = vih.BmiHeader.Height;
 
-                if (height < 10 || width < 10)
-                {
+                if (height < 10 || width < 10) {
                     continue;
                 }
                 string tempfile = Path.GetTempFileName() + ".bmp";
 
                 int ia = m.WriteBitmapBits(pos, width, height, tempfile);
-                if (File.Exists(tempfile))
-                {
-                    using (var bitmap = new Bitmap(tempfile))
-                    {
+                if (File.Exists(tempfile)) {
+                    using (var bitmap = new Bitmap(tempfile)) {
                         bitmap.Save(thumbFilename, ImageFormat.Jpeg);
                     }
 

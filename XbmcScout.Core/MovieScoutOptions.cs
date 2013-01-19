@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MediaScout
-{
-    public class MovieScoutOptions
-    {
+namespace XbmcScout.Core {
+    public class MovieScoutOptions {
         public bool SaveXBMCMeta;
         public bool SaveMyMoviesMeta;
 

@@ -40,7 +40,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="DirFunc.cs" />
     <Compile Include="MediaScoutMessage.cs" />
     <Compile Include="MoveFileFunc.cs" />

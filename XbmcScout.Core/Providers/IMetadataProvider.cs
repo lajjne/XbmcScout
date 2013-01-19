@@ -2,20 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MediaScout.Providers
-{
-    public interface IMetadataProvider
-    {
-        String name
-        {
+namespace XbmcScout.Core.Providers {
+    public interface IMetadataProvider {
+        String name {
             get;
         }
-        String version
-        {
+        String version {
             get;
         }
-        String url
-        {
+        String url {
             get;
         }
     }

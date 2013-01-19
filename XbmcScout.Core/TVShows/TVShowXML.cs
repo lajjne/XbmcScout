@@ -5,11 +5,9 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 
-namespace MediaScout
-{
+namespace XbmcScout.Core {
     [XmlRoot("Series")]
-    public class TVShowXML
-    {
+    public class TVShowXML {
 
         #region Serialize Properties
 
@@ -28,20 +26,18 @@ namespace MediaScout
 
         [XmlIgnore]
         private String overview;
-        public String Overview
-        {
+        public String Overview {
             get { return overview; }
             set { overview = value; }
         }
 
         [XmlIgnore]
         private String seriesName;
-        public String SeriesName
-        {
+        public String SeriesName {
             get { return seriesName; }
             set { seriesName = value; }
         }
-        
+
         #endregion
 
         #region Non Serialze Properties
@@ -59,29 +55,25 @@ namespace MediaScout
         public String posterthumb;
 
         [XmlIgnore]
-        public String PosterThumb
-        {
+        public String PosterThumb {
             get { return posterthumb; }
             set { posterthumb = value; }
         }
-        
+
         [XmlIgnore]
-        public String ID
-        {
+        public String ID {
             get { return id; }
             set { id = value; }
         }
-        
+
         [XmlIgnore]
-        public String Title
-        {
+        public String Title {
             get { return SeriesName; }
             set { SeriesName = value; }
         }
 
         [XmlIgnore]
-        public String Description
-        {
+        public String Description {
             get { return Overview; }
             set { Overview = value; }
         }
@@ -90,8 +82,7 @@ namespace MediaScout
         private String year = null;
 
         [XmlIgnore]
-        public String Year
-        {
+        public String Year {
             get { return year; }
             set { year = value; }
         }
@@ -103,34 +94,28 @@ namespace MediaScout
 
         #region Save File Routines
 
-        public String GetXMLFilename()
-        {
+        public String GetXMLFilename() {
             return ("series.xml");
         }
-        public String GetNFOFileName()
-        {
+        public String GetNFOFileName() {
             return ("tvshow.nfo");
         }
 
-        public String GetXMLFile(String Directory)
-        {
+        public String GetXMLFile(String Directory) {
             return (Directory + "\\" + GetXMLFilename());
         }
-        public String GetNFOFile(String Directory)
-        {
+        public String GetNFOFile(String Directory) {
             return (Directory + "\\" + GetNFOFileName());
         }
 
-        public void SaveXML(String Folderpath)
-        {
+        public void SaveXML(String Folderpath) {
             String FileName = Folderpath + "\\series.xml";
             XmlSerializer s = new XmlSerializer(typeof(TVShowXML));
             TextWriter w = new StreamWriter(FileName);
             s.Serialize(w, this);
             w.Close();
         }
-        public void SaveNFO(String Folderpath)
-        {
+        public void SaveNFO(String Folderpath) {
             TVShowNFO tsNFO = new TVShowNFO();
             tsNFO.title = this.Title;
             tsNFO.rating = this.Rating;
@@ -145,10 +130,8 @@ namespace MediaScout
             tsNFO.studio = this.Network;
             tsNFO.genre = this.Genre;
 
-            foreach (Person actor in this.Persons)
-            {                
-                tsNFO.Actors.Add(new ActorsNFO()
-                {
+            foreach (Person actor in this.Persons) {
+                tsNFO.Actors.Add(new ActorsNFO() {
                     name = actor.Name,
                     role = actor.Role,
                     thumb = actor.Thumb
@@ -156,11 +139,10 @@ namespace MediaScout
             }
             tsNFO.Save(GetNFOFile(Folderpath));
         }
-        
+
         #endregion
 
-        public override String ToString()
-        {
+        public override String ToString() {
             return this.Title;
         }
     }

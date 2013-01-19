@@ -7,8 +7,8 @@
     <ProjectGuid>{18D604D6-918C-4D28-A69B-9AA7911257EB}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>XbmcScout.Console</RootNamespace>
-    <AssemblyName>XbmcScout.Console</AssemblyName>
+    <RootNamespace>XbmcScout</RootNamespace>
+    <AssemblyName>XbmcScout</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -46,6 +46,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\XbmcScout.Core\XbmcScout.Core.csproj">
+      <Project>{bd8e3a15-e470-4644-a435-d382a042672f}</Project>
+      <Name>XbmcScout.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -6,21 +6,18 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.IO;
 
-namespace MediaScout
-{
+namespace XbmcScout.Core {
     [XmlRoot("Title")]
-    public class MovieXML
-    {
+    public class MovieXML {
         #region Serialize Properties
-        
+
         [XmlIgnore]
         private String localtitle;
-        public String LocalTitle
-        {
+        public String LocalTitle {
             get { return localtitle; }
             set { localtitle = value; }
         }
-        
+
         public String OriginalTitle;
         public String SortTitle;
         public String RunningTime;
@@ -32,8 +29,7 @@ namespace MediaScout
 
         [XmlIgnore]
         private String description;
-        public String Description
-        {
+        public String Description {
             get { return description; }
             set { description = value; }
         }
@@ -49,29 +45,25 @@ namespace MediaScout
         public bool LoadedFromCache;
 
         [XmlIgnore]
-        public String Rating
-        {
+        public String Rating {
             get { return IMDBrating; }
             set { IMDBrating = value; }
         }
 
         [XmlIgnore]
-        public String Year
-        {
+        public String Year {
             get { return ProductionYear; }
             set { ProductionYear = value; }
         }
 
         [XmlIgnore]
-        public String Length
-        {
+        public String Length {
             get { return RunningTime; }
             set { RunningTime = value; }
         }
 
         [XmlIgnore]
-        public String TMDbId
-        {
+        public String TMDbId {
             get { return ID; }
             set { ID = value; }
         }
@@ -80,15 +72,13 @@ namespace MediaScout
         public String posterthumb;
 
         [XmlIgnore]
-        public String PosterThumb
-        {
+        public String PosterThumb {
             get { return posterthumb; }
             set { posterthumb = value; }
         }
-        
+
         [XmlIgnore]
-        public String Title
-        {
+        public String Title {
             get { return OriginalTitle; }
             set { OriginalTitle = value; }
         }
@@ -100,55 +90,45 @@ namespace MediaScout
         public String MPAA;
 
         #endregion
-        
+
         #region Get And Save File Routines
 
-        public String GetXBMCThumbFilename(String FileName)
-        {
+        public String GetXBMCThumbFilename(String FileName) {
             return (FileName + ".tbn");
         }
-        public String GetXBMCThumbFile(String Directory, String FileName)
-        {
+        public String GetXBMCThumbFile(String Directory, String FileName) {
             return (Directory + "\\" + GetXBMCThumbFilename(FileName));
         }
 
-        public String GetXBMCBackdropFilename(String FileName)
-        {
+        public String GetXBMCBackdropFilename(String FileName) {
             return (FileName + "_fanart.jpg");
         }
-        public String GetXBMCBackdropFile(String Directory, String FileName)
-        {
+        public String GetXBMCBackdropFile(String Directory, String FileName) {
             return (Directory + "\\" + GetXBMCBackdropFilename(FileName));
         }
 
-        public String GetXMLFilename()
-        {
+        public String GetXMLFilename() {
             return ("mymovies.xml");
         }
-        public String GetNFOFilename()
-        {
+        public String GetNFOFilename() {
             return ("movie.nfo");
         }
 
-        public String GetXMLFile(String Directory)
-        {
+        public String GetXMLFile(String Directory) {
             return (Directory + "\\" + GetXMLFilename());
         }
-        public String GetNFOFile(String Directory)
-        {
+        public String GetNFOFile(String Directory) {
             return (Directory + "\\" + GetNFOFilename());
         }
-        
-        public void SaveXML(String FolderPath)
-        {
+
+        public void SaveXML(String FolderPath) {
             String FileName = GetXMLFile(FolderPath); ;
             XmlSerializer s = new XmlSerializer(typeof(MovieXML));
             TextWriter w = new StreamWriter(FileName);
             s.Serialize(w, this);
             w.Close();
         }
-        public void SaveNFO(String FolderPath)
-        {
+        public void SaveNFO(String FolderPath) {
             MovieNFO mNFO = new MovieNFO();
             mNFO.title = this.Title;
             mNFO.rating = this.Rating;
@@ -159,16 +139,14 @@ namespace MediaScout
             mNFO.mpaa = this.MPAA;
             mNFO.id = this.ID;
 
-            if (this.Genres.Count > 0)
-            {
+            if (this.Genres.Count > 0) {
                 mNFO.genre = this.Genres[0].name;
                 for (int i = 1; i < this.Genres.Count; i++)
                     mNFO.genre += " / " + this.Genres[i].name;
             }
 
             foreach (Person p in this.Persons)
-                if (p.Type == "Director")
-                {
+                if (p.Type == "Director") {
                     if (mNFO.director == null)
                         mNFO.director = p.Name;
                     else
@@ -176,8 +154,7 @@ namespace MediaScout
                 }
 
             foreach (Person p in this.Persons)
-                if (p.Type == "Writer")
-                {
+                if (p.Type == "Writer") {
                     if (mNFO.credits == null)
                         mNFO.credits = p.Name;
                     else
@@ -186,19 +163,17 @@ namespace MediaScout
 
             foreach (Person p in this.Persons)
                 if (p.Type == "Actor")
-                    mNFO.Actors.Add(new ActorsNFO()
-                    {
+                    mNFO.Actors.Add(new ActorsNFO() {
                         name = p.Name,
                         role = p.Role,
                         thumb = p.Thumb
                     });
             mNFO.Save(GetNFOFile(FolderPath));
         }
-        
+
         #endregion
 
-        public override String ToString()
-        {
+        public override String ToString() {
             return this.Title;
         }
     }

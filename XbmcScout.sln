@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XbmcScout.Core", "XbmcScout.Core\XbmcScout.Core.csproj", "{BD8E3A15-E470-4644-A435-D382A042672F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XbmcScout.Console", "XbmcScout.Console\XbmcScout.Console.csproj", "{18D604D6-918C-4D28-A69B-9AA7911257EB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XbmcScout", "XbmcScout\XbmcScout.csproj", "{18D604D6-918C-4D28-A69B-9AA7911257EB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

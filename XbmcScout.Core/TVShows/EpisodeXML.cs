@@ -5,11 +5,9 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 
-namespace MediaScout
-{
+namespace XbmcScout.Core {
     [XmlRoot("Item")]
-    public class EpisodeXML
-    {
+    public class EpisodeXML {
         public Int32 ID;
         public String Director;
         public String EpisodeID;
@@ -45,18 +43,15 @@ namespace MediaScout
         public String Rating;
 
         #region Save File Routines
-        
-        public String GetMetadataFolder(String Directory)
-        {
+
+        public String GetMetadataFolder(String Directory) {
             return (Directory + "\\metadata");
         }
 
-        public String GetXBMCThumbFilename(String FileName)
-        {
+        public String GetXBMCThumbFilename(String FileName) {
             return (FileName + ".tbn");
         }
-        public String GetMyMoviesThumbFilename()
-        {
+        public String GetMyMoviesThumbFilename() {
             String File = null;
             if (PosterName != null)
                 File = PosterName;
@@ -65,43 +60,35 @@ namespace MediaScout
             return File;
         }
 
-        public String GetXBMCThumbFile(String Directory, String FileName)
-        {
+        public String GetXBMCThumbFile(String Directory, String FileName) {
             return (Directory + "\\" + GetXBMCThumbFilename(FileName));
         }
-        public String GetMyMoviesThumbFile(String Directory)
-        {
+        public String GetMyMoviesThumbFile(String Directory) {
             return GetMetadataFolder(Directory) + "\\" + GetMyMoviesThumbFilename();
         }
 
-        public String GetXMLFilename(String FileName)
-        {
+        public String GetXMLFilename(String FileName) {
             return (GetMetadataFolder(FileName) + ".xml");
         }
-        public String GetNFOFileName(String FileName)
-        {
+        public String GetNFOFileName(String FileName) {
             return (FileName + ".nfo");
         }
 
-        public String GetXMLFile(String Directory, String FileName)
-        {
+        public String GetXMLFile(String Directory, String FileName) {
             return (GetMetadataFolder(Directory) + "\\" + GetXMLFilename(FileName));
         }
-        public String GetNFOFile(String Directory, String FileName)
-        {
+        public String GetNFOFile(String Directory, String FileName) {
             return (Directory + "\\" + GetNFOFileName(FileName));
         }
 
-        public void SaveXML(String FolderPath, String Filename)
-        {
+        public void SaveXML(String FolderPath, String Filename) {
             String FilePath = GetXMLFile(FolderPath, Filename);
             XmlSerializer s = new XmlSerializer(typeof(EpisodeXML));
             TextWriter w = new StreamWriter(FilePath);
             s.Serialize(w, this);
             w.Close();
         }
-        public void SaveNFO(String FolderPath, String Filename)
-        {
+        public void SaveNFO(String FolderPath, String Filename) {
             EpisodeNFO eNFO = new EpisodeNFO();
             eNFO.title = this.EpisodeName;
             eNFO.rating = this.Rating;
@@ -111,12 +98,12 @@ namespace MediaScout
             eNFO.aired = this.FirstAired;
             eNFO.credits = this.Writer;
             eNFO.director = this.Director;
-           
+
             eNFO.Save(GetNFOFile(FolderPath, Filename));
         }
 
         #endregion
 
-        
+
     }
 }

@@ -6,11 +6,9 @@ using System.Xml.Serialization;
 using System.IO;
 
 
-namespace MediaScout
-{
+namespace XbmcScout.Core {
     [XmlRoot("episodedetails")]
-    public class EpisodeNFO
-    {
+    public class EpisodeNFO {
         public String title;
         public String rating;
         public String season;
@@ -23,8 +21,7 @@ namespace MediaScout
         [XmlElement("actor")]
         public List<ActorsNFO> Actors = new List<ActorsNFO>();
 
-        public void Save(String FilePath)
-        {
+        public void Save(String FilePath) {
             XmlSerializer s = new XmlSerializer(typeof(EpisodeNFO));
             TextWriter w = new StreamWriter(FilePath);
             s.Serialize(w, this);

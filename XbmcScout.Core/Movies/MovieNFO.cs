@@ -6,13 +6,10 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.IO;
 
-namespace MediaScout
-{
+namespace XbmcScout.Core {
     [XmlRoot("movie")]
-    public class MovieNFO
-    {        
-        public String title
-        {
+    public class MovieNFO {
+        public String title {
             get { return localtitle; }
             set { localtitle = originaltitle = sorttitle = value; }
         }
@@ -37,12 +34,11 @@ namespace MediaScout
         public List<ActorsNFO> Actors = new List<ActorsNFO>();
 
         public String trailer;
-        
+
         [XmlIgnore]
         private string localtitle;
 
-        public void Save(String FilePath)
-        {            
+        public void Save(String FilePath) {
             XmlSerializer s = new XmlSerializer(typeof(MovieNFO));
             TextWriter w = new StreamWriter(FilePath);
             s.Serialize(w, this);

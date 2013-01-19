@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using MediaScout.Providers;
+using XbmcScout.Core.Providers;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Drawing;
 using System.IO;
 
-namespace MediaScout.Providers
-{
-    public class TheTVDBProvider : ITVMetadataProvider
-    {
+namespace XbmcScout.Core.Providers {
+    public class TheTVDBProvider : ITVMetadataProvider {
         public MediaScoutMessage.Message Message;
         int level = 0;
 
-        public TheTVDBProvider(MediaScoutMessage.Message Message)
-        {
+        public TheTVDBProvider(MediaScoutMessage.Message Message) {
             this.Message = Message;
         }
 
@@ -25,7 +22,7 @@ namespace MediaScout.Providers
         public string url { get { return "http://www.thetvdb.com"; } }
 
         #endregion
-        
+
         /// <summary>
         /// http://www.thetvdb.com/api/GetSeries.php?seriesname=Chuck
         /// http://www.thetvdb.com/api/4AD667B666AA62FA/series/80348/all/en.xml
@@ -43,13 +40,11 @@ namespace MediaScout.Providers
         public DateTime dtDefaultCache = DateTime.Now.Subtract(new TimeSpan(14, 0, 0, 0));
 
         #region Search for TV Show
-        
-        public TVShowXML[] Search(String SeriesName)
-        {
+
+        public TVShowXML[] Search(String SeriesName) {
             return Search(SeriesName, defaultLanguage);
         }
-        public TVShowXML[] Search(String SeriesName, String Language)
-        {
+        public TVShowXML[] Search(String SeriesName, String Language) {
             if (Message != null)
                 Message("Querying TV ID for " + SeriesName, MediaScoutMessage.MessageType.Task, level);
 
@@ -57,14 +52,12 @@ namespace MediaScout.Providers
             XmlNode node;
             List<TVShowXML> tvshows = new List<TVShowXML>();
 
-            try
-            {
+            try {
                 xdoc.Load(urlSeriesID + SeriesName + "&language=" + Language);
                 node = xdoc.DocumentElement;
 
                 XmlNodeList xnl = node.SelectNodes("/Data/Series");
-                for (int i = 0; i < xnl.Count; i++)
-                {
+                for (int i = 0; i < xnl.Count; i++) {
                     TVShowXML t = new TVShowXML();
                     if (xnl[i]["seriesid"] != null)
                         t.SeriesID = xnl[i]["seriesid"].InnerText;
@@ -82,7 +75,7 @@ namespace MediaScout.Providers
                         t.PosterThumb = urlPoster + xnl[i]["banner"].InnerText;
 
                     if (xnl[i].SelectSingleNode("FirstAired") != null)
-                        if(!String.IsNullOrEmpty(xnl[i].SelectSingleNode("FirstAired").InnerText))
+                        if (!String.IsNullOrEmpty(xnl[i].SelectSingleNode("FirstAired").InnerText))
                             t.Year = xnl[i].SelectSingleNode("FirstAired").InnerText.Substring(0, 4);
 
                     tvshows.Add(t);
@@ -91,37 +84,31 @@ namespace MediaScout.Providers
                 if (Message != null)
                     Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
 
-                if(tvshows.Count > 0)
+                if (tvshows.Count > 0)
                     return tvshows.ToArray();
 
-            }
-            catch (Exception ex)
-            {
-                if(Message != null)
+            } catch (Exception ex) {
+                if (Message != null)
                     Message(ex.Message, MediaScoutMessage.MessageType.TaskError, level);
             }
 
             return null;
         }
-        
+
         #endregion
-        
+
         #region Get TV Show Details
-        
-        public TVShowXML GetTVShow(String TVShowID)
-        {
+
+        public TVShowXML GetTVShow(String TVShowID) {
             return GetTVShow(TVShowID, defaultLanguage, defaultCacheDir, dtDefaultCache, level);
         }
-        public TVShowXML GetTVShow(String TVShowID, DateTime dtCacheTime, int level)
-        {
+        public TVShowXML GetTVShow(String TVShowID, DateTime dtCacheTime, int level) {
             return GetTVShow(TVShowID, defaultLanguage, defaultCacheDir, dtCacheTime, level);
         }
-        public TVShowXML GetTVShow(String TVShowID, String language)
-        {
+        public TVShowXML GetTVShow(String TVShowID, String language) {
             return GetTVShow(TVShowID, language, defaultCacheDir, dtDefaultCache, level);
         }
-        public TVShowXML GetTVShow(String TVShowID, String Language, String CacheDirectory, DateTime dtCacheTime, int level)
-        {
+        public TVShowXML GetTVShow(String TVShowID, String Language, String CacheDirectory, DateTime dtCacheTime, int level) {
             if (level == -1)
                 level = this.level;
 
@@ -139,88 +126,80 @@ namespace MediaScout.Providers
             if (Language == null)
                 Language = defaultLanguage;
 
-            try
-            {
+            try {
                 s = new TVShowXML();
-                if (File.Exists(CacheDirectory + "\\" + TVShowID + ".xml") && (DateTime.Compare(File.GetLastWriteTime(CacheDirectory + "\\" + TVShowID + ".xml"), dtCacheTime) > 0))
-                {
+                if (File.Exists(CacheDirectory + "\\" + TVShowID + ".xml") && (DateTime.Compare(File.GetLastWriteTime(CacheDirectory + "\\" + TVShowID + ".xml"), dtCacheTime) > 0)) {
                     if (Message != null)
                         Message("Loading from cache", MediaScoutMessage.MessageType.Task, level);
 
                     xdoc.Load(CacheDirectory + "\\" + TVShowID + ".xml");
                     s.LoadedFromCache = true;
-                }
-                else
-                {
+                } else {
                     if (Message != null)
                         Message("Fetching Metadata", MediaScoutMessage.MessageType.Task, level);
                     xdoc.Load(urlMetadata + TVShowID + "/all/" + Language + ".xml");
                     s.LoadedFromCache = false;
                 }
 
-                node = xdoc.DocumentElement;                                
+                node = xdoc.DocumentElement;
 
                 //Create Series/Fetch Series Metadata
                 nodeList = node.SelectNodes("/Data/Series");
                 s.SeriesID = s.ID = TVShowID;
                 s.SeriesName = nodeList[0].SelectSingleNode("SeriesName").InnerText;
-                
-                s.PosterThumb = nodeList[0].SelectSingleNode("poster").InnerText;                
-                
-                if(nodeList[0].SelectSingleNode("Network").InnerText != null)
+
+                s.PosterThumb = nodeList[0].SelectSingleNode("poster").InnerText;
+
+                if (nodeList[0].SelectSingleNode("Network").InnerText != null)
                     s.Network = nodeList[0].SelectSingleNode("Network").InnerText;
-                if(nodeList[0].SelectSingleNode("Rating").InnerText != null)
+                if (nodeList[0].SelectSingleNode("Rating").InnerText != null)
                     s.Rating = nodeList[0].SelectSingleNode("Rating").InnerText;
-                if(nodeList[0].SelectSingleNode("Overview").InnerText != null)
+                if (nodeList[0].SelectSingleNode("Overview").InnerText != null)
                     s.Overview = nodeList[0].SelectSingleNode("Overview").InnerText;
-                if(nodeList[0].SelectSingleNode("Runtime").InnerText != null)
+                if (nodeList[0].SelectSingleNode("Runtime").InnerText != null)
                     s.Runtime = nodeList[0].SelectSingleNode("Runtime").InnerText;
-                if(nodeList[0].SelectSingleNode("Genre").InnerText != null)
+                if (nodeList[0].SelectSingleNode("Genre").InnerText != null)
                     s.Genre = nodeList[0].SelectSingleNode("Genre").InnerText;
-                if(nodeList[0].SelectSingleNode("FirstAired").InnerText != null)
+                if (nodeList[0].SelectSingleNode("FirstAired").InnerText != null)
                     s.FirstAired = nodeList[0].SelectSingleNode("FirstAired").InnerText;
-                if(nodeList[0].SelectSingleNode("ContentRating").InnerText != null)
+                if (nodeList[0].SelectSingleNode("ContentRating").InnerText != null)
                     s.ContentRating = nodeList[0].SelectSingleNode("ContentRating").InnerText;
-                if(nodeList[0].SelectSingleNode("Actors").InnerText != null)                
+                if (nodeList[0].SelectSingleNode("Actors").InnerText != null)
                     s.Actors = nodeList[0].SelectSingleNode("Actors").InnerText;
 
                 if (nodeList[0].SelectSingleNode("FirstAired") != null)
                     if (!String.IsNullOrEmpty(nodeList[0].SelectSingleNode("FirstAired").InnerText))
                         s.Year = nodeList[0].SelectSingleNode("FirstAired").InnerText.Substring(0, 4);
-                
+
                 //Deal with the XML for specific episodes
                 nodeList = node.SelectNodes("/Data/Episode");
 
                 s.Persons = GetActors(s.ID);
 
-                foreach (XmlNode x in nodeList)
-                {
+                foreach (XmlNode x in nodeList) {
                     //Extract metadata for episode/seasons
                     Int32 SeasonNumber = Int32.Parse(x["SeasonNumber"].InnerText);
                     Int32 EpisodeNumber = Int32.Parse(x["EpisodeNumber"].InnerText);
                     String EpisodePosterURL = x["filename"].InnerText;
 
-                    if (!s.Seasons.ContainsKey(SeasonNumber))
-                    {
+                    if (!s.Seasons.ContainsKey(SeasonNumber)) {
                         s.Seasons.Add(SeasonNumber, new Season(SeasonNumber, TVShowID));
                     }
 
-                    if (!s.Seasons[SeasonNumber].Episodes.ContainsKey(EpisodeNumber))
-                    {
+                    if (!s.Seasons[SeasonNumber].Episodes.ContainsKey(EpisodeNumber)) {
                         EpisodeXML ep = new EpisodeXML();
                         ep.ID = EpisodeNumber;
                         ep.EpisodeNumber = EpisodeNumber.ToString();
-                        ep.EpisodeName =  x["EpisodeName"].InnerText;
+                        ep.EpisodeName = x["EpisodeName"].InnerText;
                         if (String.IsNullOrEmpty(EpisodePosterURL))
                             ep.PosterUrl = "";
-                        else
-                        {
+                        else {
                             ep.PosterUrl = urlPoster + EpisodePosterURL;
                             ep.PosterName = EpisodePosterURL.Substring(EpisodePosterURL.LastIndexOf("/") + 1);
                         }
                         ep.FirstAired = x["FirstAired"].InnerText;
                         ep.ProductionCode = x["ProductionCode"].InnerText;
-                        ep.Overview = x["Overview"].InnerText;;
+                        ep.Overview = x["Overview"].InnerText; ;
                         ep.EpisodeID = x["id"].InnerText;
                         ep.SeasonNumber = SeasonNumber.ToString();
                         ep.GuestStars = x["GuestStars"].InnerText;
@@ -235,8 +214,7 @@ namespace MediaScout.Providers
                     Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
 
                 //Cache metadata
-                if ( (!s.LoadedFromCache) || (!File.Exists(CacheDirectory + "\\" + TVShowID + ".xml")) )
-                {
+                if ((!s.LoadedFromCache) || (!File.Exists(CacheDirectory + "\\" + TVShowID + ".xml"))) {
                     if (Message != null)
                         Message("Caching Metadata", MediaScoutMessage.MessageType.Task, level);
                     xdoc.Save(CacheDirectory + "\\" + TVShowID + ".xml");
@@ -244,10 +222,8 @@ namespace MediaScout.Providers
                         Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
                 }
 
-                
-            }
-            catch (Exception ex)
-            {
+
+            } catch (Exception ex) {
                 s = null;
                 if (Message != null)
                     Message(ex.Message, MediaScoutMessage.MessageType.TaskError, level);
@@ -260,29 +236,27 @@ namespace MediaScout.Providers
         #endregion
 
         #region Get Episode Details
-        
-        public EpisodeXML GetEpisode(String TVShowID, String SeasonID, String EpisodeID)
-        {
+
+        public EpisodeXML GetEpisode(String TVShowID, String SeasonID, String EpisodeID) {
             XmlDocument xdoc = new XmlDocument();
             XmlNode node;
-            XmlNodeList nodeList;            
+            XmlNodeList nodeList;
             EpisodeXML e = new EpisodeXML();
 
             String Language = defaultLanguage;
-           
-            try
-            {
+
+            try {
                 if (Message != null)
                     Message("Fetching Episode Metadata", MediaScoutMessage.MessageType.Task, level);
 
                 xdoc.Load(urlMetadata + TVShowID + "/default/" + SeasonID + "/" + EpisodeID + "/" + Language + ".xml");
-                node = xdoc.DocumentElement;                
+                node = xdoc.DocumentElement;
 
                 //Create Series/Fetch Episode Metadata
                 nodeList = node.SelectNodes("/Data/Episode");
                 e.ID = int.Parse(EpisodeID);
                 e.SeriesID = nodeList[0].SelectSingleNode("id").InnerText;
-                e.EpisodeName = nodeList[0].SelectSingleNode("EpisodeName").InnerText;                
+                e.EpisodeName = nodeList[0].SelectSingleNode("EpisodeName").InnerText;
 
                 e.SeasonID = nodeList[0].SelectSingleNode("seasonid").InnerText;
                 e.EpisodeNumber = nodeList[0].SelectSingleNode("EpisodeNumber").InnerText;
@@ -297,8 +271,7 @@ namespace MediaScout.Providers
                 String EpisodePosterUrl = nodeList[0].SelectSingleNode("filename").InnerText;
                 if (String.IsNullOrEmpty(EpisodePosterUrl))
                     e.PosterUrl = "";
-                else
-                {
+                else {
                     e.PosterUrl = urlPoster + EpisodePosterUrl;
                     e.PosterName = EpisodePosterUrl.Substring(EpisodePosterUrl.LastIndexOf("/") + 1);
                 }
@@ -307,11 +280,9 @@ namespace MediaScout.Providers
 
                 if (Message != null)
                     Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 e = null;
-                if(Message != null)
+                if (Message != null)
                     Message(ex.Message, MediaScoutMessage.MessageType.TaskError, level);
             }
 
@@ -319,7 +290,7 @@ namespace MediaScout.Providers
         }
 
         #endregion
-        
+
         #region Get Images for TV Show
         /// <summary>
         /// http://www.thetvdb.com/api/4AD667B666AA62FA/series/79384/banners.xml
@@ -328,13 +299,11 @@ namespace MediaScout.Providers
         /// <param name="type"></param>
         /// <param name="seasonNum"></param>
         /// <returns></returns>
-        public Posters[] GetPosters(String TVShowID, TVShowPosterType type, String seasonNum)
-        {
+        public Posters[] GetPosters(String TVShowID, TVShowPosterType type, String seasonNum) {
             //if (Message != null)
             //    Message("Getting " + type.ToString().Replace("_", " ") + " List", MediaScoutMessage.MessageType.Task, (seasonNum != null) ? level + 1 : level);
 
-            try
-            {
+            try {
                 XmlDocument xdoc = new XmlDocument();
                 xdoc.Load(urlMetadata + TVShowID + "/banners.xml");
                 XmlNodeList xnl = xdoc.DocumentElement.SelectNodes("/Banners/Banner");
@@ -343,18 +312,14 @@ namespace MediaScout.Providers
                 List<Posters> posters = new List<Posters>();
 
                 String t = StringEnum.GetStringValue(type);
-                foreach (XmlNode x in xnl)
-                {
-                    if (x.SelectSingleNode("BannerType").InnerText == t)
-                    {
-                        if (type == TVShowPosterType.Season_Poster)
-                        {
+                foreach (XmlNode x in xnl) {
+                    if (x.SelectSingleNode("BannerType").InnerText == t) {
+                        if (type == TVShowPosterType.Season_Poster) {
                             if (x.SelectSingleNode("Season").InnerText != seasonNum)
                                 continue;
                         }
 
-                        Posters p = new Posters()
-                        {
+                        Posters p = new Posters() {
                             Poster = urlPoster + x.SelectSingleNode("BannerPath").InnerText,
                             Thumb = (x.SelectSingleNode("ThumbnailPath") != null) ? urlPoster + x.SelectSingleNode("ThumbnailPath").InnerText : urlPoster + x.SelectSingleNode("BannerPath").InnerText,
                             Resolution = (x.SelectSingleNode("BannerType2") != null) ? x.SelectSingleNode("BannerType2").InnerText : null
@@ -369,11 +334,9 @@ namespace MediaScout.Providers
 
                 if (posters.Count > 0)
                     return posters.ToArray();
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 if (Message != null)
-                    Message(ex.Message, MediaScoutMessage.MessageType.TaskError, (seasonNum!=null)? level + 1 : level);
+                    Message(ex.Message, MediaScoutMessage.MessageType.TaskError, (seasonNum != null) ? level + 1 : level);
             }
 
             return null;
@@ -387,32 +350,28 @@ namespace MediaScout.Providers
         /// </summary>
         /// <param name="TVShowID"></param>        
         /// <returns></returns>
-        public List<Person> GetActors(String TVShowID)
-        {
+        public List<Person> GetActors(String TVShowID) {
             List<Person> Actors = new List<Person>();
 
-            try
-            {
+            try {
                 XmlDocument xdoc = new XmlDocument();
                 xdoc.Load(urlMetadata + TVShowID + "/actors.xml");
                 XmlNodeList xnl = xdoc.DocumentElement.SelectNodes("/Actors/Actor");
 
-                
-                foreach (XmlNode x in xnl)
-                {
+
+                foreach (XmlNode x in xnl) {
                     String Name = null;
                     String Role = null;
                     String Thumb = null;
                     if (x.SelectSingleNode("Name") != null)
                         Name = x.SelectSingleNode("Name").InnerText;
                     if (x.SelectSingleNode("Role") != null)
-                        if(!String.IsNullOrEmpty(x.SelectSingleNode("Role").InnerText))
+                        if (!String.IsNullOrEmpty(x.SelectSingleNode("Role").InnerText))
                             Role = x.SelectSingleNode("Role").InnerText;
                     if (x.SelectSingleNode("Image") != null)
-                        if(!String.IsNullOrEmpty(x.SelectSingleNode("Image").InnerText))
+                        if (!String.IsNullOrEmpty(x.SelectSingleNode("Image").InnerText))
                             Thumb = urlPoster + x.SelectSingleNode("Image").InnerText;
-                    Person p = new Person()
-                    {
+                    Person p = new Person() {
                         Name = Name,
                         Type = "Actor",
                         Role = Role,
@@ -421,10 +380,8 @@ namespace MediaScout.Providers
 
                     Actors.Add(p);
                 }
-                    
-            }
-            catch (Exception ex)
-            {
+
+            } catch (Exception ex) {
                 if (Message != null)
                     Message(ex.Message, MediaScoutMessage.MessageType.TaskError, level);
             }
@@ -434,9 +391,8 @@ namespace MediaScout.Providers
 
         #endregion
     }
-    
-    public enum TVShowPosterType
-    {
+
+    public enum TVShowPosterType {
         [StringValue("poster")]
         Poster,
 

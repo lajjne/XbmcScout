@@ -2,14 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MediaScout
-{
-    public class MediaScoutMessage
-    {
+namespace XbmcScout.Core {
+    public class MediaScoutMessage {
         public delegate void Message(String msg, MessageType mt, int level);
 
-        public enum MessageType
-        {
+        public enum MessageType {
             Task = 0,
             TaskResult = 1,
             TaskError = 2,
