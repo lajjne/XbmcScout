@@ -7,6 +7,9 @@ using System.IO;
 
 
 namespace XbmcScout.Core {
+    /// <summary>
+    /// http://wiki.xbmc.org/index.php?title=Import-export_library#TV_Episodes
+    /// </summary>
     [XmlRoot("episodedetails")]
     public class EpisodeNFO {
         public String title;

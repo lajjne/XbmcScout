@@ -7,8 +7,13 @@ using System.ComponentModel;
 using System.IO;
 
 namespace XbmcScout.Core {
+    /// <summary>
+    /// See http://wiki.xbmc.org/index.php?title=Import-export_library#Movies
+    /// </summary>
     [XmlRoot("movie")]
     public class MovieNFO {
+        
+
         public String title {
             get { return localtitle; }
             set { localtitle = originaltitle = sorttitle = value; }
