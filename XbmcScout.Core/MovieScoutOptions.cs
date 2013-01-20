@@ -4,11 +4,11 @@ using System.Text;
 
 namespace XbmcScout.Core {
     public class MovieScoutOptions {
-        public bool SaveXBMCMeta;
+        public bool SaveXBMCMeta = true;
         public bool SaveMyMoviesMeta;
 
-        public bool GetMoviePosters;
-        public bool GetMovieFilePosters;
+        public bool GetMoviePosters = true;
+        public bool GetMovieFilePosters = true; // backfrop/fanart
         public bool MoveFiles;
 
         public bool DownloadAllPosters;
@@ -18,8 +18,9 @@ namespace XbmcScout.Core {
         public String FileRenameFormat;
         public String DirRenameFormat;
 
-        public String[] AllowedFileTypes;
-        public String[] AllowedSubtitles;
+        public String[] AllowedFileTypes = {".avi",".mkv",".mp4",".mpg",".mpeg",".ogm",".wmv",".divx",".dvr-ms"};
+        public String[] AllowedSubtitles = {".sub", ".idx;", ".srt"};
+
         public bool ForceUpdate;
 
         public bool overwrite;

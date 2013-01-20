@@ -12,7 +12,6 @@ namespace XbmcScout {
     public class Program {
 
         private static IMovieMetadataProvider movieProvider = new TheMovieDBProvider(Debug);
-        static int loglevel;
 
         public static void Main(string[] args) {
             bool show_help = false;
@@ -109,13 +108,13 @@ namespace XbmcScout {
             MovieXML selected = null;
             if (results != null && results.Length > 0) {
                 if (results[0].ID == null) {
-                    //If the result is 'empty', don't allow it to process
+                    // if the result is 'empty', don't allow it to process
                     selected = null;
                 } else if (results.Length == 1) {
-                    //If there is only one result, skip the selection dialog
+                    // if there is only one result, skip the selection dialog
                     selected = results[0];
                 } else {
-                    // TODO: display selection prompt
+                    // display selection prompt
                     Console.WriteLine("Found " + selected + " matching movies. Select best match:");
                     Console.WriteLine();
                     for (int i = 0; i < results.Length; i++) {
@@ -132,9 +131,8 @@ namespace XbmcScout {
             }
 
             while (selected == null) {
-                // no results, ask user to refine or broaden their search terms.
-                // ie if a folder is "007 - From russia with love", it may not match "From Russia With Love"
-                Console.WriteLine("No match for '" + name + "'. Please refine the search:");
+                // no results, ask user to refine or broaden their search terms
+                Console.WriteLine("No match for '" + name + "'. Please refine or broaden the search terms:");
                 Console.Write("> ");
                 while (string.IsNullOrWhiteSpace(name = Console.ReadLine())) {
                     Console.Write("> ");
@@ -148,15 +146,22 @@ namespace XbmcScout {
         /// <summary>
         /// Fetches all information for the the movie in the specified directory
         /// </summary>
+        /// <param name="selected"></param>
+        /// <param name="dir"></param>
         private static void FetchMovie(MovieXML selected, DirectoryInfo dir) {
-            //Fetch all the information
+            // fetch all information for the selected movie
             if (selected != null) {
                 selected = movieProvider.Get(selected.ID);
 
-                // save .nfo file
-                selected.SaveNFO(dir.FullName);
+                if (selected != null) {
 
-                // TODO: save images...
+                    var scout = new MovieScout(new MovieScoutOptions(), Debug, ".actors") { m = selected };
+
+                    // save .nfo file
+                    //selected.SaveNFO(dir.FullName);
+                    scout.ProcessDirectory(dir.FullName);
+                    
+                }
             }
 
         }
