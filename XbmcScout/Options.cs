@@ -136,7 +136,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
 
-namespace XbmcScout.Options {
+namespace XbmcScout {
 
     public class OptionValueCollection : IList, IList<string> {
 
