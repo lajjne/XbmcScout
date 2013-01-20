@@ -15,13 +15,9 @@ namespace XbmcScout.Core.Providers {
             this.Message = Message;
         }
 
-        #region IMovieMetadataProvider Members
-
         string IMetadataProvider.name { get { return "The Movie DB"; } }
         string IMetadataProvider.version { get { return "2.1"; } }
         string IMetadataProvider.url { get { return ""; } }
-
-        #endregion
 
         /// <summary>
         /// http://api.themoviedb.org/2.1/Movie.search/en/xml/1a9efd23fff9c2ed07c90358e2b3d280/Transformers
@@ -176,7 +172,12 @@ namespace XbmcScout.Core.Providers {
                     //Cache metadata
                     if (Message != null)
                         Message("Caching Metadata", MediaScoutMessage.MessageType.Task, level);
+
+                    if (!Directory.Exists(defaultCacheDir)) {
+                        Directory.CreateDirectory(defaultCacheDir);
+                    }
                     xdoc.Save(defaultCacheDir + "\\" + MovieID + ".xml");
+
                     if (Message != null)
                         Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
                 }

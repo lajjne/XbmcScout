@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,13 +15,15 @@ namespace XbmcScout {
 
         public static void Main(string[] args) {
 
-            string dir = args[0];
+            string dir = @"C:\Temp\Avatar (2009)";
             if (string.IsNullOrWhiteSpace(dir)) {
                 throw new ArgumentNullException("dir");
             }
 
+            string name = GetDirectoryName(dir);
+
             // 1. try to match directory name to movie via api call to the movie db
-            var results = movieProvider.Search(dir);
+            var results = movieProvider.Search(name);
 
             // 2. if one match, use it; otherwise display matching files and let user select best match
             MovieXML selected = null;
@@ -42,7 +45,7 @@ namespace XbmcScout {
                 // ie if a folder is "007 - From russia with love", it may not match "From Russia With Love"
             }
 
-            FetchMovie(selected);
+            FetchMovie(selected, dir);
         }
 
         public static void Message(String msg, XbmcScout.Core.MediaScoutMessage.MessageType mt, int level) {
@@ -50,16 +53,22 @@ namespace XbmcScout {
         }
 
 
+        public static string GetDirectoryName(String path) {
+            return (new DirectoryInfo(path).Name);
+        }
+
         /// <summary>
-        /// Fetches the selected movie
+        /// Fetches all information for the the selected movie and stores it in the specified directory
         /// </summary>
-        private static void FetchMovie(MovieXML selected) {
+        private static void FetchMovie(MovieXML selected, string path) {
             //Fetch all the information
             if (selected != null) {
                 selected = movieProvider.Get(selected.ID);
 
-                // TODO: save meta data
-                selected.SaveNFO(@"C:\Temp\movie.nfo");
+                // save .nfo file
+                selected.SaveNFO(path);
+
+                // TODO: save images...
             }
 
         }
