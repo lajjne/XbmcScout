@@ -17,9 +17,9 @@ namespace XbmcScout.Core.Providers {
 
         #region IMetadataProvider Members
 
-        public string name { get { return "TheTVDB"; } }
-        public string version { get { return "2.1"; } }
-        public string url { get { return "http://www.thetvdb.com"; } }
+        public string Name { get { return "TheTVDB"; } }
+        public string Version { get { return "2.1"; } }
+        public string Url { get { return "http://www.thetvdb.com"; } }
 
         #endregion
 

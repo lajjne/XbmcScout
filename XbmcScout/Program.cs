@@ -42,7 +42,7 @@ namespace XbmcScout {
             DirectoryInfo dir = null;
             try {
                 dir = new DirectoryInfo(string.Join(" ", extra.ToArray()));
-            } catch (Exception e) {
+            } catch {
                 Console.Write("No directory specified. Try 'xbmcscout /?' for more information.");
                 return;
             }
@@ -155,7 +155,7 @@ namespace XbmcScout {
 
                 if (selected != null) {
 
-                    var scout = new MovieScout(new MovieScoutOptions(), Debug, ".actors") { m = selected };
+                    var scout = new MovieScout(new MovieScoutOptions(), Debug) { m = selected };
 
                     // save .nfo file
                     //selected.SaveNFO(dir.FullName);

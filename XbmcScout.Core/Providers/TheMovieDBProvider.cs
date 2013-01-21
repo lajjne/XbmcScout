@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 using System.IO;
 
 namespace XbmcScout.Core.Providers {
+
     public class TheMovieDBProvider : IMovieMetadataProvider {
         public MediaScoutMessage.Message Message;
         int level = 0;
@@ -15,9 +16,9 @@ namespace XbmcScout.Core.Providers {
             this.Message = Message;
         }
 
-        string IMetadataProvider.name { get { return "The Movie DB"; } }
-        string IMetadataProvider.version { get { return "2.1"; } }
-        string IMetadataProvider.url { get { return ""; } }
+        string IMetadataProvider.Name { get { return "The Movie DB"; } }
+        string IMetadataProvider.Version { get { return "2.1"; } }
+        string IMetadataProvider.Url { get { return ""; } }
 
         /// <summary>
         /// http://api.themoviedb.org/2.1/Movie.search/en/xml/1a9efd23fff9c2ed07c90358e2b3d280/Transformers

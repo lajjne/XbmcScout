@@ -3,15 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace XbmcScout.Core.Providers {
+
     public interface IMetadataProvider {
-        String name {
-            get;
-        }
-        String version {
-            get;
-        }
-        String url {
-            get;
-        }
+        string Name { get; }
+        string Version { get; }
+        string Url { get; }
     }
 }

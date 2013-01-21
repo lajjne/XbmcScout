@@ -461,16 +461,16 @@ namespace XbmcScout {
             throw new InvalidOperationException("Option has no names!");
         }
 
-        [Obsolete("Use KeyedCollection.this[string]")]
-        protected Option GetOptionForName(string option) {
-            if (option == null)
-                throw new ArgumentNullException("option");
-            try {
-                return base[option];
-            } catch (KeyNotFoundException) {
-                return null;
-            }
-        }
+        //[Obsolete("Use KeyedCollection.this[string]")]
+        //protected Option GetOptionForName(string option) {
+        //    if (option == null)
+        //        throw new ArgumentNullException("option");
+        //    try {
+        //        return base[option];
+        //    } catch (KeyNotFoundException) {
+        //        return null;
+        //    }
+        //}
 
         protected override void InsertItem(int index, Option item) {
             base.InsertItem(index, item);
@@ -609,7 +609,8 @@ namespace XbmcScout {
             bool process = true;
             OptionContext c = CreateOptionContext();
             c.OptionIndex = -1;
-            var def = GetOptionForName("<>");
+            //var def = GetOptionForName("<>");
+            var def = this["<>"];
             var unprocessed =
                 from argument in arguments
                 where ++c.OptionIndex >= 0 && (process || def != null)

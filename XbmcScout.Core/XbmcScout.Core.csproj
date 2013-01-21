@@ -40,9 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DirFunc.cs" />
+    <Compile Include="Helpers\DirectoryHelper.cs" />
     <Compile Include="MediaScoutMessage.cs" />
-    <Compile Include="MoveFileFunc.cs" />
     <Compile Include="MovieScout.cs" />
     <Compile Include="MovieScoutOptions.cs" />
     <Compile Include="Movies\Genre.cs" />
@@ -59,7 +58,6 @@
     <Compile Include="Providers\TheTVDBProvider.cs" />
     <Compile Include="StringEnum.cs" />
     <Compile Include="StringValueAttribute.cs" />
-    <Compile Include="ThumbCreator.cs" />
     <Compile Include="TVScout.cs" />
     <Compile Include="TVScoutOptions.cs" />
     <Compile Include="TVShows\EpisodeNFO.cs" />
@@ -67,6 +65,9 @@
     <Compile Include="TVShows\Season.cs" />
     <Compile Include="TVShows\TVShowNFO.cs" />
     <Compile Include="TVShows\TVShowXML.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
