@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 using System.Reflection;
+using XbmcScout.Attributes;
 
-namespace XbmcScout {
+namespace XbmcScout.Helpers {
     public static class StringEnum {
         private static Hashtable _stringValues = new Hashtable();
 

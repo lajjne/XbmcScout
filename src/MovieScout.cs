@@ -9,21 +9,20 @@ using System.Drawing;
 using System.Net;
 
 using XbmcScout.Providers;
+using XbmcScout.Models;
 
 namespace XbmcScout {
     public class MovieScout {
+        MovieXML m;
+        Flags flags;
         MediaScoutMessage.Message Message;
-        MovieScoutOptions options;
-        Providers.TheMovieDBProvider tmdb;
-        //DirFunc mdf = new DirFunc();
-        //MoveFileFunc mff = new MoveFileFunc();
-
-        public MovieXML m;
+        TheMovieDBProvider tmdb;
 
         int level = 1;
 
-        public MovieScout(MovieScoutOptions options, MediaScoutMessage.Message Message) {
-            this.options = options;
+        public MovieScout(MovieXML movie,Flags flags, MediaScoutMessage.Message Message) {
+            this.m = movie;
+            this.flags = flags;
             this.Message = Message;
             tmdb = new XbmcScout.Providers.TheMovieDBProvider(Message);
         }
@@ -34,11 +33,11 @@ namespace XbmcScout {
 
             SaveMeta(directory, level);
 
-            if (options.GetPoster) {
+            if (flags.GetPosters) {
                 SaveImage(directory, "folder.jpg", null, 0, Providers.MoviePosterType.Poster, level);
             }         
 
-            if (options.GetBackdrop) {
+            if (flags.GetBackdrops) {
                 SaveImage(directory, "fanart.jpg", null, 0, MoviePosterType.Backdrop, level);
             }
 
@@ -49,7 +48,7 @@ namespace XbmcScout {
             try {
                 //Save Movie NFO
                 Message("Saving Metadata as " + m.GetNFOFile(directory), MediaScoutMessage.MessageType.Task, level);
-                if (options.Overwrite == true || !File.Exists(m.GetNFOFile(directory))) {
+                if (flags.Overwrite == true || !File.Exists(m.GetNFOFile(directory))) {
                     m.SaveNFO(directory);
                     Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
                 } else {
@@ -64,7 +63,7 @@ namespace XbmcScout {
         private void SaveImage(String directory, String filename, Posters[] images, int index, Providers.MoviePosterType ptype, int level) {
             Message("Saving " + ptype.ToString().Replace("_", " ") + " as " + filename, MediaScoutMessage.MessageType.Task, level);
 
-            if (!File.Exists(directory + "\\" + filename) || options.Overwrite == true) {
+            if (!File.Exists(directory + "\\" + filename) || flags.Overwrite == true) {
                 try {
                     if (images == null)
                         images = tmdb.GetPosters(m.ID, ptype);

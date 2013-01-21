@@ -1,3 +1,4 @@
+// http://www.ndesk.org/Options
 //
 // Options.cs
 //
@@ -136,7 +137,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Linq;
 
-namespace XbmcScout {
+namespace NDesk.Options {
 
     public class OptionValueCollection : IList, IList<string> {
 

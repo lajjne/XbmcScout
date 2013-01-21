@@ -9,20 +9,22 @@ using System.Xml.Serialization;
 using System.Windows;
 
 using XbmcScout.Providers;
+using XbmcScout.Models;
 
 namespace XbmcScout {
     public class TVScout {
+        TVShowXML show;
         MediaScoutMessage.Message Message;
-        TVScoutOptions options;
-        Providers.TheTVDBProvider tvdb;
-
-
-        public TVShowXML series;
+        Flags flags;
+        TheTVDBProvider tvdb;
+        List<string> AllowedFileTypes = new List<string> {".avi",".mkv",".mp4",".mpg",".mpeg",".ogm",".wmv",".divx",".dvr-ms"};
+        
 
         int level = 1;
 
-        public TVScout(TVScoutOptions options, MediaScoutMessage.Message Message) {
-            this.options = options;
+        public TVScout(TVShowXML show, Flags flags, MediaScoutMessage.Message Message) {
+            this.show = show;
+            this.flags = flags;
             this.Message = Message;
             tvdb = new XbmcScout.Providers.TheTVDBProvider(Message);
         }
@@ -32,27 +34,20 @@ namespace XbmcScout {
             int level = this.level;
             String name = null;
 
-
-
             SaveMeta(directory, level);
 
 
-            if (options.GetPoster) {
+            if (flags.GetPosters) {
                 SaveImage(directory, "folder.jpg", null, 0, null, Providers.TVShowPosterType.Poster, level);
+                SaveImage(directory, "banner.jpg", null, 0, null, Providers.TVShowPosterType.Banner, level);
             }
 
-            if (options.GetBackdrop) {
+            if (flags.GetBackdrops) {
                 SaveImage(directory, "fanart.jpg", null, 0, null, Providers.TVShowPosterType.Backdrop, level);
             }
 
 
-            if (options.GetSeriesBanners)
-                SaveImage(directory, "banner.jpg", null, 0, null, Providers.TVShowPosterType.Banner, level);
-
-
-
             // Process the season folders
-
             DirectoryInfo diShow = new DirectoryInfo(directory);
             foreach (DirectoryInfo diSeason in diShow.GetDirectories())
                 ProcessSeasonDirectory(directory, diSeason, level + 1);
@@ -75,7 +70,7 @@ namespace XbmcScout {
                 int seasonNum = Int32.Parse(mc[0].Groups[1].Captures[0].Value);
 
                 //FreQi - Make sure the discovered season number is valid (in the metadata from theTVDB.com)
-                if (series.Seasons.ContainsKey(seasonNum)) {
+                if (show.Seasons.ContainsKey(seasonNum)) {
                     String newName = "Season " + seasonNum.ToString();
                     ProcessSeason(ShowDirectory, newName, seasonNum, level + 1);
                 } else
@@ -89,19 +84,18 @@ namespace XbmcScout {
 
 
             //Save the season poster, if there is one and we're supposed to
-            if (options.GetPoster) {
+            if (flags.GetPosters) {
                 SaveImage(directory + "\\" + seasonFldr, "folder.jpg", null, 0, seasonNum.ToString(), XbmcScout.Providers.TVShowPosterType.Season_Poster, level);
             }
 
-            if (options.GetBackdrop) {
+            if (flags.GetBackdrops) {
                 SaveImage(directory + "\\" + seasonFldr, "fanart.jpg", null, 0, seasonNum.ToString(), XbmcScout.Providers.TVShowPosterType.Season_Backdrop, level);
             }
 
-            List<String> filetypes = new List<String>(options.AllowedFileTypes);
             DirectoryInfo diEpisodes = new DirectoryInfo(String.Format("{0}\\{1}", directory, seasonFldr));
 
             foreach (FileInfo fi in diEpisodes.GetFiles())
-                if (filetypes.Contains(fi.Extension.ToLower()))
+                if (AllowedFileTypes.Contains(fi.Extension.ToLower()))
                     ProcessEpisode(directory, fi, seasonNum, true, level + 1);
 
         }
@@ -173,16 +167,16 @@ namespace XbmcScout {
                     //Do we know what season this file "thinks" it's belongs to and is it in the right folder?
                     if (ei.SeasonID != seasonNum)
 
-                        if (series.Seasons[ei.SeasonID].Episodes.ContainsKey(ei.EpisodeID))
+                        if (show.Seasons[ei.SeasonID].Episodes.ContainsKey(ei.EpisodeID))
                             return ProcessFile(ShowDirectory, fi, ei.SeasonID, ei.EpisodeID, level + 1);
                         else {
                             Message(String.Format("Episode {0} Not Found In Season {1}", ei.EpisodeID, ei.SeasonID), MediaScoutMessage.MessageType.Error, level + 1);
-                            if (series.LoadedFromCache) {
+                            if (show.LoadedFromCache) {
                                 //Information in cache may be old, refetch and check again
                                 Message("Updating Cache", MediaScoutMessage.MessageType.Task, level + 1);
-                                series = tvdb.GetTVShow(series.SeriesID, DateTime.Now, level + 2);
-                                if (series != null) {
-                                    if (series.Seasons[ei.SeasonID].Episodes.ContainsKey(ei.EpisodeID))
+                                show = tvdb.GetTVShow(show.SeriesID, DateTime.Now, level + 2);
+                                if (show != null) {
+                                    if (show.Seasons[ei.SeasonID].Episodes.ContainsKey(ei.EpisodeID))
                                         return ProcessFile(ShowDirectory, fi, ei.SeasonID, ei.EpisodeID, level + 1);
                                     else
                                         Message("Invalid Episode, Skipping", MediaScoutMessage.MessageType.Error, level + 1);
@@ -198,11 +192,11 @@ namespace XbmcScout {
 
         public String ProcessFile(String ShowDirectory, FileInfo file, int seasonID, int episodeID, int level) {
             String name = file.Name;
-            EpisodeXML episode = series.Seasons[seasonID].Episodes[episodeID];
+            EpisodeXML episode = show.Seasons[seasonID].Episodes[episodeID];
 
 
             Message("Saving Metadata as " + episode.GetNFOFileName(file.Name.Replace(file.Extension, "")), MediaScoutMessage.MessageType.Task, level);
-            if (options.Overwrite || !File.Exists(episode.GetNFOFile(file.DirectoryName, file.Name.Replace(file.Extension, "")))) {
+            if (flags.Overwrite || !File.Exists(episode.GetNFOFile(file.DirectoryName, file.Name.Replace(file.Extension, "")))) {
                 episode.SaveNFO(file.DirectoryName, file.Name.Replace(file.Extension, ""));
                 Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
             } else {
@@ -215,9 +209,9 @@ namespace XbmcScout {
         private void SaveMeta(String directory, int level) {
             try {
                 //Save Movie NFO
-                Message("Saving Metadata as " + series.GetNFOFile(directory), MediaScoutMessage.MessageType.Task, level);
-                if (options.Overwrite || !File.Exists(series.GetNFOFile(directory))) {
-                    series.SaveNFO(directory);
+                Message("Saving Metadata as " + show.GetNFOFile(directory), MediaScoutMessage.MessageType.Task, level);
+                if (flags.Overwrite || !File.Exists(show.GetNFOFile(directory))) {
+                    show.SaveNFO(directory);
                     Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
                 } else
                     Message("Already Exists, skipping", MediaScoutMessage.MessageType.TaskResult, level);
@@ -228,10 +222,10 @@ namespace XbmcScout {
 
         private void SaveImage(String directory, String filename, Posters[] images, int index, String SeasonNum, Providers.TVShowPosterType ptype, int level) {
             Message("Saving " + ptype.ToString().Replace("_", (SeasonNum != null) ? " " + SeasonNum + " " : " ") + " as " + filename, MediaScoutMessage.MessageType.Task, level);
-            if (!File.Exists(directory + "\\" + filename) || options.Overwrite) {
+            if (!File.Exists(directory + "\\" + filename) || flags.Overwrite) {
                 try {
                     if (images == null)
-                        images = tvdb.GetPosters(series.ID, ptype, SeasonNum);
+                        images = tvdb.GetPosters(show.ID, ptype, SeasonNum);
                     if (images != null) {
                         images[index].SavePoster(directory + "\\" + filename);
                         Message("Done", MediaScoutMessage.MessageType.TaskResult, level);

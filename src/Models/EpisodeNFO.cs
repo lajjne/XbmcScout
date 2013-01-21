@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 using System.IO;
 
 
-namespace XbmcScout {
+namespace XbmcScout.Models {
     /// <summary>
     /// http://wiki.xbmc.org/index.php?title=Import-export_library#TV_Episodes
     /// </summary>

@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using XbmcScout.Providers;
 using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
+using XbmcScout.Models;
+using XbmcScout.Attributes;
+using XbmcScout.Helpers;
 
 namespace XbmcScout.Providers {
 
@@ -34,7 +38,7 @@ namespace XbmcScout.Providers {
 
 
         #region Search for a movie
-        public MovieXML[] Search(string MovieName) {
+        public IVideo[] Search(string MovieName) {
             if (Message != null)
                 Message("Querying Movie ID for " + MovieName, MediaScoutMessage.MessageType.Task, level);
 
@@ -80,7 +84,7 @@ namespace XbmcScout.Providers {
                     Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
 
                 if (movies.Count > 0)
-                    return movies.ToArray();
+                    return movies.Cast<IVideo>().ToArray();
 
             } catch (Exception ex) {
                 if (Message != null)

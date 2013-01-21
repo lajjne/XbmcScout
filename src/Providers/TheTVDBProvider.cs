@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using XbmcScout.Providers;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Drawing;
 using System.IO;
+using XbmcScout.Models;
+using XbmcScout.Attributes;
+using XbmcScout.Helpers;
 
 namespace XbmcScout.Providers {
     public class TheTVDBProvider : ITVMetadataProvider {
@@ -41,10 +45,10 @@ namespace XbmcScout.Providers {
 
         #region Search for TV Show
 
-        public TVShowXML[] Search(String SeriesName) {
+        public IVideo[] Search(String SeriesName) {
             return Search(SeriesName, defaultLanguage);
         }
-        public TVShowXML[] Search(String SeriesName, String Language) {
+        public IVideo[] Search(String SeriesName, String Language) {
             if (Message != null)
                 Message("Querying TV ID for " + SeriesName, MediaScoutMessage.MessageType.Task, level);
 
@@ -85,7 +89,7 @@ namespace XbmcScout.Providers {
                     Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
 
                 if (tvshows.Count > 0)
-                    return tvshows.ToArray();
+                    return tvshows.Cast<IVideo>().ToArray();
 
             } catch (Exception ex) {
                 if (Message != null)

@@ -6,9 +6,9 @@ using System.Xml.Serialization;
 using System.ComponentModel;
 using System.IO;
 
-namespace XbmcScout {
+namespace XbmcScout.Models {
     [XmlRoot("Title")]
-    public class MovieXML {
+    public class MovieXML : IVideo {
         #region Serialize Properties
 
         [XmlIgnore]
@@ -25,7 +25,7 @@ namespace XbmcScout {
         public String ProductionYear;
 
         [XmlElement("TMDbId")]
-        public String ID;
+        public String ID { get; set; }
 
         [XmlIgnore]
         private String description;

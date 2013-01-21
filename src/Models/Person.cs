@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace XbmcScout {
+namespace XbmcScout.Models {
     public class Person {
         public String Name;
         public String Type;

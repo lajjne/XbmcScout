@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 
-namespace XbmcScout {
+namespace XbmcScout.Models {
     public class Posters {
         String poster;
         String posterfilename;

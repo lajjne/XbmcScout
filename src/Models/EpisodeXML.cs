@@ -5,7 +5,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 
-namespace XbmcScout {
+namespace XbmcScout.Models {
     [XmlRoot("Item")]
     public class EpisodeXML {
         public Int32 ID;

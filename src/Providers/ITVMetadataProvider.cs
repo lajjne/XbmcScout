@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using XbmcScout.Models;
 
 namespace XbmcScout.Providers {
     interface ITVMetadataProvider : IMetadataProvider {
 
-        TVShowXML[] Search(string SeriesName);
+        IVideo[] Search(string SeriesName);
 
         TVShowXML GetTVShow(string TVShowID);
 

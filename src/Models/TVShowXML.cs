@@ -5,9 +5,9 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 
-namespace XbmcScout {
+namespace XbmcScout.Models {
     [XmlRoot("Series")]
-    public class TVShowXML {
+    public class TVShowXML : IVideo {
 
         #region Serialize Properties
 

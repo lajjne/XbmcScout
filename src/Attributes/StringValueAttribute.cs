@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XbmcScout {
+namespace XbmcScout.Attributes {
     public class StringValueAttribute : System.Attribute {
         private string _value;
 
