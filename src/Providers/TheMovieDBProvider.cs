@@ -13,11 +13,10 @@ using XbmcScout.Helpers;
 namespace XbmcScout.Providers {
 
     public class TheMovieDBProvider : IMovieMetadataProvider {
-        public MediaScoutMessage.Message Message;
-        int level = 0;
+        Log _log;
 
-        public TheMovieDBProvider(MediaScoutMessage.Message Message) {
-            this.Message = Message;
+        public TheMovieDBProvider(Log logger) {
+            this._log = logger;
         }
 
         string IMetadataProvider.Name { get { return "The Movie DB"; } }
@@ -39,8 +38,8 @@ namespace XbmcScout.Providers {
 
         #region Search for a movie
         public IVideo[] Search(string MovieName) {
-            if (Message != null)
-                Message("Querying Movie ID for " + MovieName, MediaScoutMessage.MessageType.Task, level);
+            if (_log != null)
+                _log(Level.Debug, "Querying Movie ID for " + MovieName);
 
             //TheMovieDB doesn't handle & very well, so convert to "AND"
             MovieName = MovieName.Replace("&", "and");
@@ -80,15 +79,14 @@ namespace XbmcScout.Providers {
                     movies.Add(m);
                 }
 
-                if (Message != null)
-                    Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
+
 
                 if (movies.Count > 0)
                     return movies.Cast<IVideo>().ToArray();
 
             } catch (Exception ex) {
-                if (Message != null)
-                    Message(ex.Message, MediaScoutMessage.MessageType.TaskError, level);
+                if (_log != null)
+                    _log(Level.Warn, ex.Message);
             }
 
             return null;
@@ -110,14 +108,14 @@ namespace XbmcScout.Providers {
             try {
                 m = new MovieXML();
                 if (File.Exists(defaultCacheDir + "\\" + MovieID + ".xml") && (DateTime.Compare(File.GetLastWriteTime(defaultCacheDir + "\\" + MovieID + ".xml"), dtCacheTime) > 0)) {
-                    if (Message != null)
-                        Message("Loading from cache", MediaScoutMessage.MessageType.Task, level);
+                    if (_log != null)
+                        _log(Level.Debug, "Loading from cache");
 
                     xdoc.Load(defaultCacheDir + "\\" + MovieID + ".xml");
                     m.LoadedFromCache = true;
                 } else {
-                    if (Message != null)
-                        Message("Fetching Metadata", MediaScoutMessage.MessageType.Task, level);
+                    if (_log != null)
+                        _log(Level.Debug, "Fetching Metadata");
                     xdoc.Load(urlMovieInfo + MovieID);
                     m.LoadedFromCache = false;
                 }
@@ -170,27 +168,24 @@ namespace XbmcScout.Providers {
                 foreach (XmlNode x in nlGenres)
                     m.Genres.Add(new Genre() { name = x.Attributes["name"].Value });
 
-                if (Message != null)
-                    Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
+
 
                 if ((!File.Exists(defaultCacheDir + "\\" + MovieID + ".xml"))) {
                     //Cache metadata
-                    if (Message != null)
-                        Message("Caching Metadata", MediaScoutMessage.MessageType.Task, level);
+                    if (_log != null)
+                        _log(Level.Debug, "Caching Metadata");
 
                     if (!Directory.Exists(defaultCacheDir)) {
                         Directory.CreateDirectory(defaultCacheDir);
                     }
                     xdoc.Save(defaultCacheDir + "\\" + MovieID + ".xml");
 
-                    if (Message != null)
-                        Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
                 }
 
             } catch (Exception ex) {
                 m = null;
-                if (Message != null)
-                    Message(ex.Message, MediaScoutMessage.MessageType.TaskError, level);
+                if (_log != null)
+                    _log(Level.Warn, ex.Message);
             }
 
             return m;
@@ -201,9 +196,6 @@ namespace XbmcScout.Providers {
 
         #region Get Movie Images
         public Posters[] GetPosters(String MovieID, MoviePosterType type) {
-            //if (Message != null)
-            //    Message("Getting " + type.ToString() + " List", MediaScoutMessage.MessageType.Task, level);
-
             try {
                 string selectImages = string.Format("./images/image[@type='{0}'][@size='original']", StringEnum.GetStringValue(type));
                 string selectImageThumbnail = string.Format("./images/image[@type='{0}'][@size='thumb']", StringEnum.GetStringValue(type));
@@ -231,14 +223,11 @@ namespace XbmcScout.Providers {
                     posters.Add(p);
                 }
 
-                //if (Message != null)
-                //    Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
-
                 if (posters.Count > 0)
                     return posters.ToArray();
             } catch (Exception ex) {
-                if (Message != null)
-                    Message(ex.Message, MediaScoutMessage.MessageType.TaskError, level);
+                if (_log != null)
+                    _log(Level.Warn, ex.Message);
             }
             return null;
         }
@@ -273,8 +262,8 @@ namespace XbmcScout.Providers {
                 }
 
             } catch (Exception ex) {
-                if (Message != null)
-                    Message(ex.Message, MediaScoutMessage.MessageType.TaskError, level);
+                if (_log != null)
+                    _log(Level.Warn, ex.Message);
             }
 
             return Actors;
@@ -317,8 +306,8 @@ namespace XbmcScout.Providers {
                     Persons.Add(p);
                 }
             } catch (Exception ex) {
-                if (Message != null)
-                    Message(ex.Message, MediaScoutMessage.MessageType.TaskError, level);
+                if (_log != null)
+                    _log(Level.Warn, ex.Message);
             }
 
             return Persons;
@@ -361,8 +350,8 @@ namespace XbmcScout.Providers {
                 }
 
             } catch (Exception ex) {
-                if (Message != null)
-                    Message(ex.Message, MediaScoutMessage.MessageType.TaskError, level);
+                if (_log != null)
+                    _log(Level.Warn, ex.Message);
             }
 
             return ActorImages;

@@ -7,7 +7,7 @@ namespace XbmcScout.Models {
     /// <summary>
     /// Gets or sets the options to use when downloading metadata and images.
     /// </summary>
-    public class Flags {
+    public class Options {
 
         /// <summary>
         /// Get posters.
@@ -22,6 +22,8 @@ namespace XbmcScout.Models {
         /// <summary>
         /// Overwrite existing metadata and images.
         /// </summary>
-        public bool Overwrite;
+        public bool Overwrite = false;
+
+        public bool TvSearch = false;
     }
 }

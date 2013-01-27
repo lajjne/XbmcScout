@@ -12,11 +12,10 @@ using XbmcScout.Helpers;
 
 namespace XbmcScout.Providers {
     public class TheTVDBProvider : ITVMetadataProvider {
-        public MediaScoutMessage.Message Message;
-        int level = 0;
+        public Log _log;
 
-        public TheTVDBProvider(MediaScoutMessage.Message Message) {
-            this.Message = Message;
+        public TheTVDBProvider(Log logger) {
+            this._log = logger;
         }
 
         #region IMetadataProvider Members
@@ -49,8 +48,8 @@ namespace XbmcScout.Providers {
             return Search(SeriesName, defaultLanguage);
         }
         public IVideo[] Search(String SeriesName, String Language) {
-            if (Message != null)
-                Message("Querying TV ID for " + SeriesName, MediaScoutMessage.MessageType.Task, level);
+            if (_log != null)
+                _log(Level.Debug, "Querying TV ID for " + SeriesName);
 
             XmlDocument xdoc = new XmlDocument();
             XmlNode node;
@@ -85,15 +84,14 @@ namespace XbmcScout.Providers {
                     tvshows.Add(t);
                 }
 
-                if (Message != null)
-                    Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
+
 
                 if (tvshows.Count > 0)
                     return tvshows.Cast<IVideo>().ToArray();
 
             } catch (Exception ex) {
-                if (Message != null)
-                    Message(ex.Message, MediaScoutMessage.MessageType.TaskError, level);
+                if (_log != null)
+                    _log(Level.Warn, ex.Message);
             }
 
             return null;
@@ -104,17 +102,15 @@ namespace XbmcScout.Providers {
         #region Get TV Show Details
 
         public TVShowXML GetTVShow(String TVShowID) {
-            return GetTVShow(TVShowID, defaultLanguage, defaultCacheDir, dtDefaultCache, level);
+            return GetTVShow(TVShowID, defaultLanguage, defaultCacheDir, dtDefaultCache);
         }
-        public TVShowXML GetTVShow(String TVShowID, DateTime dtCacheTime, int level) {
-            return GetTVShow(TVShowID, defaultLanguage, defaultCacheDir, dtCacheTime, level);
+        public TVShowXML GetTVShow(String TVShowID, DateTime dtCacheTime) {
+            return GetTVShow(TVShowID, defaultLanguage, defaultCacheDir, dtCacheTime);
         }
         public TVShowXML GetTVShow(String TVShowID, String language) {
-            return GetTVShow(TVShowID, language, defaultCacheDir, dtDefaultCache, level);
+            return GetTVShow(TVShowID, language, defaultCacheDir, dtDefaultCache);
         }
-        public TVShowXML GetTVShow(String TVShowID, String Language, String CacheDirectory, DateTime dtCacheTime, int level) {
-            if (level == -1)
-                level = this.level;
+        public TVShowXML GetTVShow(String TVShowID, String Language, String CacheDirectory, DateTime dtCacheTime) {
 
             XmlDocument xdoc = new XmlDocument();
             XmlNode node;
@@ -133,14 +129,14 @@ namespace XbmcScout.Providers {
             try {
                 s = new TVShowXML();
                 if (File.Exists(CacheDirectory + "\\" + TVShowID + ".xml") && (DateTime.Compare(File.GetLastWriteTime(CacheDirectory + "\\" + TVShowID + ".xml"), dtCacheTime) > 0)) {
-                    if (Message != null)
-                        Message("Loading from cache", MediaScoutMessage.MessageType.Task, level);
+                    if (_log != null)
+                        _log(Level.Debug, "Loading from cache");
 
                     xdoc.Load(CacheDirectory + "\\" + TVShowID + ".xml");
                     s.LoadedFromCache = true;
                 } else {
-                    if (Message != null)
-                        Message("Fetching Metadata", MediaScoutMessage.MessageType.Task, level);
+                    if (_log != null)
+                        _log(Level.Debug, "Fetching Metadata");
                     xdoc.Load(urlMetadata + TVShowID + "/all/" + Language + ".xml");
                     s.LoadedFromCache = false;
                 }
@@ -214,23 +210,21 @@ namespace XbmcScout.Providers {
                     }
                 }
 
-                if (Message != null)
-                    Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
+
 
                 //Cache metadata
                 if ((!s.LoadedFromCache) || (!File.Exists(CacheDirectory + "\\" + TVShowID + ".xml"))) {
-                    if (Message != null)
-                        Message("Caching Metadata", MediaScoutMessage.MessageType.Task, level);
+                    if (_log != null)
+                        _log(Level.Debug, "Caching Metadata");
                     xdoc.Save(CacheDirectory + "\\" + TVShowID + ".xml");
-                    if (Message != null)
-                        Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
+
                 }
 
 
             } catch (Exception ex) {
                 s = null;
-                if (Message != null)
-                    Message(ex.Message, MediaScoutMessage.MessageType.TaskError, level);
+                if (_log != null)
+                    _log(Level.Warn, ex.Message);
             }
 
             return s;
@@ -250,8 +244,8 @@ namespace XbmcScout.Providers {
             String Language = defaultLanguage;
 
             try {
-                if (Message != null)
-                    Message("Fetching Episode Metadata", MediaScoutMessage.MessageType.Task, level);
+                if (_log != null)
+                    _log(Level.Debug, "Fetching Episode Metadata");
 
                 xdoc.Load(urlMetadata + TVShowID + "/default/" + SeasonID + "/" + EpisodeID + "/" + Language + ".xml");
                 node = xdoc.DocumentElement;
@@ -282,12 +276,10 @@ namespace XbmcScout.Providers {
                 e.SeriesID = nodeList[0].SelectSingleNode("seriesid").InnerText;
                 e.SeasonNumber = nodeList[0].SelectSingleNode("SeasonNumber").InnerText;
 
-                if (Message != null)
-                    Message("Done", MediaScoutMessage.MessageType.TaskResult, level);
             } catch (Exception ex) {
                 e = null;
-                if (Message != null)
-                    Message(ex.Message, MediaScoutMessage.MessageType.TaskError, level);
+                if (_log != null)
+                    _log(Level.Warn, ex.Message);
             }
 
             return e;
@@ -304,9 +296,6 @@ namespace XbmcScout.Providers {
         /// <param name="seasonNum"></param>
         /// <returns></returns>
         public Posters[] GetPosters(String TVShowID, TVShowPosterType type, String seasonNum) {
-            //if (Message != null)
-            //    Message("Getting " + type.ToString().Replace("_", " ") + " List", MediaScoutMessage.MessageType.Task, (seasonNum != null) ? level + 1 : level);
-
             try {
                 XmlDocument xdoc = new XmlDocument();
                 xdoc.Load(urlMetadata + TVShowID + "/banners.xml");
@@ -333,14 +322,12 @@ namespace XbmcScout.Providers {
                     }
                 }
 
-                //if (Message != null)
-                //    Message("Done", MediaScoutMessage.MessageType.TaskResult, (seasonNum != null) ? level + 1 : level);
 
                 if (posters.Count > 0)
                     return posters.ToArray();
             } catch (Exception ex) {
-                if (Message != null)
-                    Message(ex.Message, MediaScoutMessage.MessageType.TaskError, (seasonNum != null) ? level + 1 : level);
+                if (_log != null)
+                    _log(Level.Warn, ex.Message);
             }
 
             return null;
@@ -386,8 +373,8 @@ namespace XbmcScout.Providers {
                 }
 
             } catch (Exception ex) {
-                if (Message != null)
-                    Message(ex.Message, MediaScoutMessage.MessageType.TaskError, level);
+                if (_log != null)
+                    _log(Level.Warn, ex.Message);
             }
 
             return Actors;

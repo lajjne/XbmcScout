@@ -7,24 +7,30 @@ using XbmcScout.Providers;
 
 namespace XbmcScout {
 
-    public class Program {
+    public class XbmcScout {
 
-        private static IMovieMetadataProvider moviedb = new TheMovieDBProvider(Debug);
-        private static ITVMetadataProvider tvdb = new TheTVDBProvider(Debug);
+        private IMovieMetadataProvider _moviedb;
+        private ITVMetadataProvider _tvdb;
+        private Options _options;
+        private DirectoryInfo _dir;
 
+        private static bool debug;
+
+        /// <summary>
+        /// Main entry point. Parses command line and starts the scan.
+        /// </summary>
+        /// <param name="args"></param>
         public static void Main(string[] args) {
 
-            Flags flags = new Flags();
-            bool tvsearch = false;
-            bool debug = false;
+            Options options = new Options();
             bool show_help = false;
 
             // declare command line options
             var set = new OptionSet() {
-                { "t|tv", "scan for tv shows instead of movies", v => tvsearch = v != null },
-                { "p|posters", "download posters", v => flags.GetPosters = v != null },
-                { "b|backdrops", "download backdrops", v => flags.GetBackdrops = v != null },
-                { "o|overwrite", "overwrite existing metadata and images", v => flags.Overwrite = v != null },
+                { "t|tv", "scan for tv shows instead of movies", v => options.TvSearch = v != null },
+                { "p|posters", "download posters", v => options.GetPosters = v != null },
+                { "b|backdrops", "download backdrops", v => options.GetBackdrops = v != null },
+                { "o|overwrite", "overwrite existing metadata and images", v => options.Overwrite = v != null },
                 { "d|debug", "log debug messages", v => debug = v != null },
                 { "?|h|help", "show this message and exit", v => show_help = v != null },
             };
@@ -60,11 +66,59 @@ namespace XbmcScout {
                 return;
             }
 
+            // start the scan
+            var scout = new XbmcScout(options, dir);
+            scout.Start();
+        }
+
+        /// <summary>
+        /// Display help for the program.
+        /// </summary>
+        /// <param name="p"></param>
+        static void ShowHelp(OptionSet p) {
+            Console.WriteLine("Usage: xbmcscout [options] path");
+            Console.WriteLine("Scans a directory of Movies or TV Shows and downloads XBMC metadata and images.");
+            Console.WriteLine("Each Movie and TV Show should be in a separate subdirectory.");
+            Console.WriteLine();
+            Console.WriteLine("Options:");
+            p.WriteOptionDescriptions(Console.Out);
+        }
+
+        /// <summary>
+        /// Print log messages.
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="mt"></param>
+        /// <param name="msg"></param>
+        public static void Log(Level level, string msg) {
+            if (debug || level > Level.Info) {
+                Console.WriteLine("[{0}] {1}", level.ToString().ToUpper(), msg);
+            }
+        }
+
+
+        /// <summary>
+        /// Initializes a new instance of the XbmcScout program with the specified options.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="dir"></param>
+        public XbmcScout(Options options, DirectoryInfo dir) {
+            _moviedb = new TheMovieDBProvider(Log);
+            _tvdb = new TheTVDBProvider(Log);
+            _options = options;
+            _dir = dir;
+        }
+
+        /// <summary>
+        /// Start the directory scan.
+        /// </summary>
+        private void Start() {
+
             // get sub directories
-            var dirs = dir.GetDirectories();
-            string what = tvsearch ? "TV Shows" : "Movies";
+            var dirs = _dir.GetDirectories();
+            string what = _options.TvSearch ? "TV Shows" : "Movies";
             if (dirs.Length <= 0) {
-                Console.WriteLine("No " + what + " found in " + dir);
+                Console.WriteLine("No " + what + " found in " + _dir);
                 return;
             } else {
                 // list subdirs
@@ -83,35 +137,12 @@ namespace XbmcScout {
 
                 if (index == 0) {
                     foreach (var d in dirs) {
-                        Process(Select(tvsearch, d), tvsearch, flags, d);
+                        Process(Select(d), d);
                     }
                 } else {
-                    Process(Select(tvsearch, dirs[index - 1]), tvsearch, flags, dirs[index - 1]);
+                    Process(Select(dirs[index - 1]), dirs[index - 1]);
                 }
             }
-        }
-
-        /// <summary>
-        /// Display help for the program.
-        /// </summary>
-        /// <param name="p"></param>
-        static void ShowHelp(OptionSet p) {
-            Console.WriteLine("Usage: xbmcscout [options] path");
-            Console.WriteLine("Scans a directory of Movies or TV Shows and downloads XBMC metadata and images.");
-            Console.WriteLine("Each Movie and TV Show should be in a separate subdirectory.");
-            Console.WriteLine();
-            Console.WriteLine("Options:");
-            p.WriteOptionDescriptions(Console.Out);
-        }
-
-        /// <summary>
-        /// Print debug message.
-        /// </summary>
-        /// <param name="msg"></param>
-        /// <param name="mt"></param>
-        /// <param name="level"></param>
-        public static void Debug(String msg, XbmcScout.MediaScoutMessage.MessageType mt, int level) {
-            Console.WriteLine("[{0}] {1}", mt.ToString(), msg);
         }
 
         /// <summary>
@@ -120,14 +151,14 @@ namespace XbmcScout {
         /// <param name="dir"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        private static IVideo Select(bool tvsearch, DirectoryInfo dir, string name = null) {
-            string what = tvsearch ? "TV Shows" : "Movies";
-            
+        private IVideo Select(DirectoryInfo dir, string name = null) {
+            string what = _options.TvSearch ? "TV Shows" : "Movies";
+
             // get name of movie/tv show to search for
             name = name ?? dir.Name;
 
             // try to match directory name to movie(tvshow via api call
-            var results = tvsearch ? tvdb.Search(name) : moviedb.Search(name);
+            var results = _options.TvSearch ? _tvdb.Search(name) : _moviedb.Search(name);
 
             // if one match, use it; otherwise display matching files and let user select best match
             IVideo selected = null;
@@ -163,7 +194,7 @@ namespace XbmcScout {
                 while (string.IsNullOrWhiteSpace(name = Console.ReadLine())) {
                     Console.Write("> ");
                 }
-                selected = Select(tvsearch, dir, name);
+                selected = Select(dir, name);
             }
             return selected;
         }
@@ -175,21 +206,21 @@ namespace XbmcScout {
         /// <param name="selected"></param>
         /// <param name="tvsearch"></param>
         /// <param name="dir"></param>
-        private static void Process(IVideo selected, bool tvsearch, Flags flags, DirectoryInfo dir) {
+        private void Process(IVideo selected, DirectoryInfo dir) {
             // fetch all information for the selected movie/tvshow
             if (selected != null) {
-                if (tvsearch) {
-                    var show = tvdb.GetTVShow(selected.ID);
+                if (_options.TvSearch) {
+                    var show = _tvdb.GetTVShow(selected.ID);
                     if (show != null) {
                         // process tv show
-                        var scout = new TVScout(show, flags, Debug);
+                        var scout = new TVScout(show, _options, Log);
                         scout.ProcessDirectory(dir.FullName);
                     }
                 } else {
-                    var movie = moviedb.Get(selected.ID);
+                    var movie = _moviedb.Get(selected.ID);
                     if (movie != null) {
                         // process movie
-                        var scout = new MovieScout(movie, flags, Debug);
+                        var scout = new MovieScout(movie, _options, Log);
                         scout.ProcessDirectory(dir.FullName);
                     }
                 }
