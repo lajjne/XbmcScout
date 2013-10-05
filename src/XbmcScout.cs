@@ -1,7 +1,9 @@
 ﻿using NDesk.Options;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using TMDbLib.Client;
 using XbmcScout.Models;
 using XbmcScout.Providers;
 
@@ -21,12 +23,14 @@ namespace XbmcScout {
         /// </summary>
         /// <param name="args"></param>
         public static void Main(string[] args) {
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.CreateSpecificCulture("en-US");
 
             Options options = new Options();
             bool show_help = false;
 
             // declare command line options
             var set = new OptionSet() {
+                { "k|key=", "tmdb api key", v => options.TMDbApiKey = v },
                 { "t|tv", "scan for tv shows instead of movies", v => options.TvSearch = v != null },
                 { "p|posters", "download posters", v => options.GetPosters = v != null },
                 { "b|backdrops", "download backdrops", v => options.GetBackdrops = v != null },
@@ -103,7 +107,7 @@ namespace XbmcScout {
         /// <param name="options"></param>
         /// <param name="dir"></param>
         public XbmcScout(Options options, DirectoryInfo dir) {
-            _moviedb = new TheMovieDBProvider(Log);
+            _moviedb = new TheMovieDBProvider(options.TMDbApiKey, Log);
             _tvdb = new TheTVDBProvider(Log);
             _options = options;
             _dir = dir;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Text;
 
 namespace XbmcScout.Models {
@@ -8,6 +9,11 @@ namespace XbmcScout.Models {
     /// Gets or sets the options to use when downloading metadata and images.
     /// </summary>
     public class Options {
+
+        /// <summary>
+        /// TMDb api key
+        /// </summary>
+        public string TMDbApiKey = ConfigurationManager.AppSettings["TMDbApiKey"];
 
         /// <summary>
         /// Get posters.
@@ -24,6 +30,9 @@ namespace XbmcScout.Models {
         /// </summary>
         public bool Overwrite = false;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool TvSearch = false;
     }
 }

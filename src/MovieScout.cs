@@ -22,7 +22,7 @@ namespace XbmcScout {
             this.m = movie;
             this.options = options;
             this.log = log;
-            tmdb = new TheMovieDBProvider(log);
+            tmdb = new TheMovieDBProvider(options.TMDbApiKey, log);
         }
 
         public String ProcessDirectory(String directory) {
